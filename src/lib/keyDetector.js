@@ -1,4 +1,10 @@
 import Meyda from 'meyda';
+import { buildChromaInline } from './chromaInline.js';
+
+// ─── Feature flag ──────────────────────────────────────────────────────────────
+// true  → use the Meyda npm package (current default, known-good)
+// false → use the inline zero-dependency implementation in chromaInline.js
+const USE_MEYDA = true;
 
 // ─── Audio decode ─────────────────────────────────────────────────────────────
 async function decodeAudio(file) {
@@ -70,20 +76,24 @@ export async function detectKey(file) {
   // Limit analysis to the first 90 seconds to keep it responsive
   const analyseLength = Math.min(totalSamples, sampleRate * 90);
 
-  // ── 3. Build chromagram via Meyda ───────────────────────────────────────────
+  // ── 3. Build chromagram ─────────────────────────────────────────────────────
   const FFT_SIZE = 4096;
   const HOP      = FFT_SIZE >> 1; // 50% overlap — doubles frame count for short sounds
 
-  Meyda.bufferSize = FFT_SIZE;
-  Meyda.sampleRate = sampleRate;
-
-  const chroma = new Float64Array(12);
-  for (let start = 0; start + FFT_SIZE <= analyseLength; start += HOP) {
-    const frame = mono.slice(start, start + FFT_SIZE);
-    const frameChroma = Meyda.extract('chroma', frame);
-    if (frameChroma) {
-      for (let i = 0; i < 12; i++) chroma[i] += frameChroma[i];
+  let chroma;
+  if (USE_MEYDA) {
+    Meyda.bufferSize = FFT_SIZE;
+    Meyda.sampleRate = sampleRate;
+    chroma = new Float64Array(12);
+    for (let start = 0; start + FFT_SIZE <= analyseLength; start += HOP) {
+      const frame = mono.slice(start, start + FFT_SIZE);
+      const frameChroma = Meyda.extract('chroma', frame);
+      if (frameChroma) {
+        for (let i = 0; i < 12; i++) chroma[i] += frameChroma[i];
+      }
     }
+  } else {
+    chroma = buildChromaInline(mono, sampleRate, analyseLength, FFT_SIZE);
   }
 
   // ── 4. Normalise chromagram ─────────────────────────────────────────────────
