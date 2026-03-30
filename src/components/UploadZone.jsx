@@ -56,7 +56,7 @@ export default function UploadZone({ onFile, status, errorMsg, onRetry }) {
       <input
         ref={inputRef}
         type="file"
-        accept="audio/*,.mp3,.wav,.ogg,.flac,.aac,.m4a,.aif,.aiff,.opus"
+        accept=".mp3,.wav,.flac,.aac,.m4a"
         onChange={handleFileInput}
         style={{ display: 'none' }}
         aria-hidden="true"
@@ -79,7 +79,7 @@ function IdleState({ isDragging }) {
       <p className="upload-zone__sub">
         or <span className="upload-zone__link">click to browse</span>
       </p>
-      <p className="upload-zone__formats">MP3 · WAV · FLAC · AIFF · OGG · AAC · M4A</p>
+      <p className="upload-zone__formats">MP3 · WAV · FLAC · AAC · M4A</p>
     </>
   );
 }
