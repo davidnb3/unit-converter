@@ -1,5 +1,5 @@
 {
-  "name": "keyfinder",
+  "name": "unit-converter",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "meyda": "^5.6.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

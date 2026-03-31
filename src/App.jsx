@@ -1,80 +1,102 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ThemeToggle from './components/ThemeToggle.jsx';
-import UploadZone from './components/UploadZone.jsx';
-import ResultCard from './components/ResultCard.jsx';
-import { detectKey } from './lib/keyDetector.js';
+import { CATEGORIES, ROW_GROUPS, formatValue } from './lib/units.js';
 
 function getInitialTheme() {
-  const stored = localStorage.getItem('kf-theme');
+  const stored = localStorage.getItem('kin-theme');
   if (stored === 'dark' || stored === 'light') return stored;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+const catMap = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
+
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
-  const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'error'
-  const [result, setResult] = useState(null);   // { key, mode, camelot, filename }
-  const [errorMsg, setErrorMsg] = useState('');
+  const [catValues, setCatValues] = useState(() =>
+    Object.fromEntries(CATEGORIES.map(c => [c.id, {}]))
+  );
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('kf-theme', theme);
-
+    localStorage.setItem('kin-theme', theme);
     const meta = document.getElementById('theme-color-meta');
-    if (meta) {
-      meta.setAttribute('content', theme === 'dark' ? '#1A1714' : '#E8E2DA');
-    }
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#1A1714' : '#E8E2DA');
   }, [theme]);
 
-  function toggleTheme() {
-    setTheme(t => (t === 'light' ? 'dark' : 'light'));
-  }
+  const handleChange = useCallback((catId, unitId, raw) => {
+    const cat = catMap[catId];
+    const unit = cat.units.find(u => u.id === unitId);
 
-  async function handleFile(file) {
-    if (!file) return;
-
-    setStatus('loading');
-    setResult(null);
-    setErrorMsg('');
-
-    // Allow the loading state to render before blocking computation
-    await new Promise(resolve => setTimeout(resolve, 60));
-
-    try {
-      const detection = await detectKey(file);
-      setResult({ ...detection, filename: file.name });
-      setStatus('idle');
-    } catch (err) {
-      setErrorMsg(err.message || 'Could not analyse the audio file.');
-      setStatus('error');
+    // Empty or just a minus sign — clear the whole category
+    if (raw === '' || raw === '-') {
+      setCatValues(prev => ({
+        ...prev,
+        [catId]: raw === '-' ? { [unitId]: '-' } : {},
+      }));
+      return;
     }
-  }
 
-  function handleReset() {
-    setResult(null);
-    setStatus('idle');
-    setErrorMsg('');
-  }
+    const num = parseFloat(raw);
+    if (isNaN(num)) {
+      setCatValues(prev => ({ ...prev, [catId]: { [unitId]: raw } }));
+      return;
+    }
+
+    const baseVal = unit.toBase(num);
+    const newVals = {};
+    for (const u of cat.units) {
+      newVals[u.id] = u.id === unitId ? raw : formatValue(u.fromBase(baseVal));
+    }
+    setCatValues(prev => ({ ...prev, [catId]: newVals }));
+  }, []);
 
   return (
     <div className="app">
       <header className="header">
-        <span className="brand">KIN</span>
-        <h1 className="title">KeyFinder</h1>
-        <ThemeToggle theme={theme} onToggle={toggleTheme} />
+        <div className="header__inner">
+          <a href="https://kintools.net" className="header__brand" aria-label="Kin tools">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3 9h14M14 5l4 4-4 4" />
+              <path d="M21 15H7M10 11l-4 4 4 4" />
+            </svg>
+          </a>
+          <h1 className="header__title">Unit Converter</h1>
+          <ThemeToggle
+            theme={theme}
+            onToggle={() => setTheme(t => (t === 'light' ? 'dark' : 'light'))}
+          />
+        </div>
       </header>
 
-      <main className="main">
-        {result ? (
-          <ResultCard result={result} onReset={handleReset} onFile={handleFile} />
-        ) : (
-          <UploadZone
-            onFile={handleFile}
-            status={status}
-            errorMsg={errorMsg}
-            onRetry={handleReset}
-          />
-        )}
+      <main className="converter">
+        {ROW_GROUPS.map((group, rowIdx) => (
+          <div key={rowIdx} className="converter__row">
+            {group.map(catId => {
+              const cat = catMap[catId];
+              return (
+                <section key={catId} className="category">
+                  <div className="category__header">{cat.label}</div>
+                  {cat.units.map(unit => (
+                    <div key={unit.id} className="unit-row">
+                      <span className="unit-row__symbol" title={unit.label}>
+                        {unit.symbol}
+                      </span>
+                      <input
+                        className="unit-row__input"
+                        type="number"
+                        inputMode="decimal"
+                        placeholder="—"
+                        value={catValues[catId][unit.id] ?? ''}
+                        onChange={e => handleChange(catId, unit.id, e.target.value)}
+                        aria-label={`${unit.label} (${unit.symbol})`}
+                      />
+                    </div>
+                  ))}
+                </section>
+              );
+            })}
+          </div>
+        ))}
       </main>
     </div>
   );

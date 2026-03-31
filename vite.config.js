@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg'],
       manifest: {
-        name: 'KeyFinder',
-        short_name: 'KeyFinder',
-        description: 'Upload any audio file and instantly detect its musical key and Camelot wheel notation.',
+        name: 'Kin Unit Converter',
+        short_name: 'Unit Converter',
+        description: 'Convert between units instantly — temperature, weight, length, volume, speed, area, data, and pressure. No account, no ads, works offline.',
         theme_color: '#E8E2DA',
         background_color: '#E8E2DA',
         display: 'standalone',
