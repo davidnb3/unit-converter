@@ -1,10 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Background with rounded corners (maskable safe zone) -->
   <rect width="512" height="512" rx="114" fill="#1C1914"/>
-  <!-- Waveform / spectrum analyser mark in cream -->
-  <rect x="102" y="206" width="44" height="100" rx="22" fill="#F5F1EC" opacity="0.55"/>
-  <rect x="168" y="166" width="44" height="180" rx="22" fill="#F5F1EC" opacity="0.75"/>
-  <rect x="234" y="116" width="44" height="280" rx="22" fill="#F5F1EC"/>
-  <rect x="300" y="166" width="44" height="180" rx="22" fill="#F5F1EC" opacity="0.75"/>
-  <rect x="366" y="206" width="44" height="100" rx="22" fill="#F5F1EC" opacity="0.55"/>
+  <g stroke="#F5F1EC" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M96 180h240M280 108l80 72-80 72"/>
+    <path d="M416 332H176M232 260l-80 72 80 72"/>
+  </g>
 </svg>

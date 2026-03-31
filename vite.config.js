@@ -20,7 +20,7 @@ export default defineConfig({
         start_url: '/unit-converter/',
         icons: [
           {
-            src: '/icons/icon.svg',
+            src: 'icons/icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable',
