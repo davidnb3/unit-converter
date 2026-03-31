@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: '/keyfinder/',
+  base: '/unit-converter/',
   plugins: [
     react(),
     VitePWA({
@@ -17,7 +17,7 @@ export default defineConfig({
         background_color: '#E8E2DA',
         display: 'standalone',
         orientation: 'any',
-        start_url: '/',
+        start_url: '/unit-converter/',
         icons: [
           {
             src: '/icons/icon.svg',
