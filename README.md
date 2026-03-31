@@ -2,7 +2,7 @@
 
 A simple, free unit converter. No account, no ads, no tracking. Works offline.
 
-**Live:** [davidnb3.github.io/keyfinder](https://davidnb3.github.io/keyfinder/) *(rename repo to update URL)*
+**Live:** [davidnb3.github.io/keyfinder](https://davidnb3.github.io/unit-converter/)
 
 ---
 
